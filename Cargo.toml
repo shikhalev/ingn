@@ -1,0 +1,17 @@
+[package]
+name = "ingn"
+version = "0.1.0"
+authors = ["Ivan Shikhalev <shikhalev@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[dev-dependencies]
+more-asserts = "^0.2.1"
+
+
+[[test]]
+name = "all_tests"
+path = "src/tests/all.rs"
