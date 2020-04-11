@@ -1,4 +1,5 @@
 use super::*;
+use crate::utils;
 use serde_derive::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Copy, Clone)]
@@ -30,21 +31,36 @@ impl Default for Anchor {
   }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Default)]
+#[derive(Serialize, Deserialize, Clone, Default)]
 #[serde(default)]
 pub struct Query {
-  width: Size,
-  height: Size,
-  longer: Size,
-  smaller: Size,
-  resize_mode: ResizeMode,
-  resize_up: bool,
-  #[serde(alias="anchor")]
-  crop_anchor: Anchor,
-  crop_x:Option<u32>,
-  crop_y:Option<u32>,
-  crop_width:Option<u32>,
-  crop_height:Option<u32>,
-  crop_square:Option<u32>,
-  format: Format,
+  // resize block
+  pub width: Size,
+  pub height: Size,
+  pub longer: Size,
+  pub smaller: Size,
+  #[serde(alias = "resize")]
+  #[serde(alias = "mode")]
+  pub resize_mode: ResizeMode,
+  pub resize_up: bool,
+
+  // crop block
+  #[serde(alias = "anchor")]
+  pub crop_anchor: Anchor,
+  pub crop_x: Option<i32>,
+  pub crop_y: Option<i32>,
+  pub crop_width: Option<u32>,
+  pub crop_height: Option<u32>,
+
+  // frame block
+  pub frame_width: Option<u32>,
+  pub frame_height: Option<u32>,
+  pub frame_border: Option<u32>,
+  pub frame_color: Option<u32>,
+
+  // custom block
+  pub filters: utils::Names,
+
+  // format
+  pub format: Format,
 }

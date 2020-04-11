@@ -18,7 +18,7 @@ pub struct ImagePath {
   filename: String,
 }
 
-#[derive(Serialize, Deserialize, Default, Copy, Clone)]
+#[derive(Serialize, Deserialize, Default, Clone)]
 #[serde(default)]
 pub struct ImageQuery {
   width: Size,
@@ -52,9 +52,11 @@ impl Options for Defaults {
 
 pub async fn get<Defs: Options>(
   _path: web::Path<ImagePath>,
-  query: web::Query<ImageQuery>,
-) -> std::io::Result<web::Json<ImageQuery>> {
-  Ok(web::Json(*query))
+  query: web::Query<Query>,
+) -> std::io::Result<web::Json<Query>> {
+  let qq = query.clone();
+  // qq.filters = vec!["alpha".to_string(), "beta".to_string(), "gamma".to_string()];
+  Ok(web::Json(qq))
 }
 
 //
