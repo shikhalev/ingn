@@ -1,5 +1,4 @@
-use actix_files as fs;
-// use actix_service::Service;
+use actix_files as af;
 use actix_web::web;
 use actix_web::{App, HttpServer};
 use ingn::img;
@@ -8,7 +7,7 @@ use ingn::img;
 async fn main() -> std::io::Result<()> {
   HttpServer::new(|| {
     App::new()
-      .service(fs::Files::new("/static", ".").show_files_listing())
+      .service(af::Files::new("/static", ".").show_files_listing())
       .route(
         "/img/{filename:.*}",
         web::get().to(img::get::<img::Defaults>),

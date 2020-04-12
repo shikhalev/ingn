@@ -6,6 +6,12 @@ use std::fmt;
 #[derive(Serialize, Clone, Default, PartialEq, Debug)]
 pub struct Names(Vec<String>);
 
+impl Names {
+  pub fn new(data: Vec<String>) -> Self {
+    Self(data)
+  }
+}
+
 impl<'de> serde::de::Deserialize<'de> for Names {
   fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
   where
@@ -54,6 +60,20 @@ impl<'de> serde::de::Deserialize<'de> for Names {
   }
 }
 
+#[macro_export]
+macro_rules! name {
+  ($nm:ident) => {
+    stringify!($nm).to_string()
+  };
+}
+
+#[macro_export]
+macro_rules! names {
+  [$($nm:ident),*] => {
+    $crate::utils::Names::new(vec![$(stringify!($nm).to_string()),*])
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
@@ -62,11 +82,7 @@ mod tests {
 
   #[test]
   fn serial() {
-    let v = Names(vec![
-      "Alpha".to_string(),
-      "Beta".to_string(),
-      "Gamma".to_string(),
-    ]);
+    let v = names![Alpha, Beta, Gamma];
     let a: HashMap<String, Names> = serde_urlencoded::from_str("Names=Alpha,Beta,Gamma").unwrap();
     assert_eq!(v, a["Names"]);
     let b: Names = serde_json::from_str("[\"Alpha\",\"Beta\",\"Gamma\"]").unwrap();

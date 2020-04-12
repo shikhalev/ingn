@@ -13,7 +13,7 @@ mod query;
 #[doc(inline)]
 pub use self::query::Query;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ImagePath {
   filename: String,
 }
@@ -50,12 +50,30 @@ impl Options for Defaults {
   const FORMAT: &'static str = "auto";
 }
 
+pub trait Config {
+  const CONFIG_NAME: &'static str;
+}
+
+#[macro_export]
+macro_rules! make_config {
+  ($name:ident, $config_name:expr) => {
+    pub struct $name {}
+
+    impl $crate::img::Config for $name {
+      const CONFIG_NAME: &'static str = $config_name;
+    }
+  };
+  ($name:ident) => {
+    make_config!($name, concat!("img.", stringify!($name)));
+  };
+}
+
 pub async fn get<Defs: Options>(
   _path: web::Path<ImagePath>,
   query: web::Query<Query>,
 ) -> std::io::Result<web::Json<Query>> {
   let qq = query.clone();
-  // qq.filters = vec!["alpha".to_string(), "beta".to_string(), "gamma".to_string()];
+  // qq.filters = crate::names![Alpha,Beta,Gamma];
   Ok(web::Json(qq))
 }
 
