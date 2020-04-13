@@ -1,5 +1,4 @@
 use super::*;
-use crate::utils;
 use serde_derive::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Copy, Clone)]
@@ -51,15 +50,6 @@ pub struct Query {
   crop_y: Option<i32>,
   crop_width: Option<u32>,
   crop_height: Option<u32>,
-
-  // frame block
-  frame_width: Option<u32>,
-  frame_height: Option<u32>,
-  frame_border: Option<u32>,
-  frame_color: Option<u32>,
-
-  // custom block
-  filters: utils::Names,
 
   // format
   format: Format,

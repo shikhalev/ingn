@@ -7,19 +7,23 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = "1.0.*"
-serde_json = "1.0.*"
-serde_derive = "1.0.*"
-serde_urlencoded = "0.6.*"
-actix-web = "2.0.*"
-actix-files = "0.2.*"
-actix-rt = "1.1.*"
-actix-service = "1.0.*"
-image = "0.23.*"
-config = "0.10.*"
+serde = "*"
+serde_json = "*"
+serde_derive = "*"
+serde_urlencoded = "*"
+actix-web = "*"
+actix-files = "*"
+actix-rt = "*"
+actix-service = "*"
+image = "*"
+
+[dependencies.config]
+version = "*"
+default-features = false 
+features = ["ini", "json", "yaml", "toml"]
 
 [dev-dependencies]
-more-asserts = "0.2.*"
+more-asserts = "*"
 
 [[test]]
 name = "all_tests"
