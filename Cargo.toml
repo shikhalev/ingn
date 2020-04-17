@@ -12,15 +12,10 @@ serde_json = "*"
 serde_derive = "*"
 serde_urlencoded = "*"
 actix-web = "*"
-actix-files = "*"
 actix-rt = "*"
 actix-service = "*"
 image = "*"
-
-[dependencies.config]
-version = "*"
-default-features = false 
-features = ["ini", "json", "yaml", "toml"]
+chrono = { version="*", features = ["serde"] }
 
 [dev-dependencies]
 more-asserts = "*"
