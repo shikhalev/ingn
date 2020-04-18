@@ -19,11 +19,8 @@ pub async fn img_get(
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-  HttpServer::new(|| {
-    App::new()
-      .route("/img/{filename:.*}", web::get().to(img_get))
-  })
-  .bind("127.0.0.1:8088")?
-  .run()
-  .await
+  HttpServer::new(|| App::new().route("/img/{filename:.*}", web::get().to(img_get)))
+    .bind("127.0.0.1:8088")?
+    .run()
+    .await
 }
