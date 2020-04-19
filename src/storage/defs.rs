@@ -4,12 +4,9 @@ use std::hash;
 use std::io;
 use std::ops;
 
-pub trait Meta<'md>:
-  serde::Serialize + serde::Deserialize<'md> + Default + Clone + hash::Hash + Eq
-{
-}
+pub trait Meta: Default + Clone + hash::Hash + Eq {}
 
-pub trait Data<'md, MD, IO>:
+pub trait Data<MD, IO>:
   io::Write
   + io::BufRead
   + io::Seek
@@ -18,7 +15,7 @@ pub trait Data<'md, MD, IO>:
   + Drop
   + Sized
 where
-  MD: Meta<'md>,
+  MD: Meta,
   IO: io::Write + io::Read + io::Seek,
 {
   fn name(&self) -> &str;
@@ -39,27 +36,31 @@ pub trait Linked {
   fn children(&self) -> io::Result<Vec<String>>;
 }
 
-pub trait Storage<'md, DT, MD, IO>
+pub trait Storage<DT, MD, IO>
 where
-  DT: Data<'md, MD, IO>,
-  MD: Meta<'md>,
+  DT: Data<MD, IO>,
+  MD: Meta,
   IO: io::Write + io::Read + io::Seek,
 {
-  fn create(&self, name: &str, proc: fn(&mut DT) -> io::Result<()>) -> io::Result<()>;
+  fn create(&self, name: &str, meta: &MD, proc: fn(&mut DT) -> io::Result<()>) -> io::Result<()>;
+  fn update(&self, name: &str, meta: &MD, proc: fn(&mut DT) -> io::Result<()>) -> io::Result<()>;
   fn read(&self, name: &str, proc: fn(&mut DT) -> io::Result<()>) -> io::Result<()>;
-  fn update(&self, name: &str, proc: fn(&mut DT) -> io::Result<()>) -> io::Result<()>;
   fn delete(&self, name: &str) -> io::Result<()>;
   fn alias(&self, name: &str, src: &str) -> io::Result<()>;
 }
 
-pub trait LinkedStorage<'md, DT, MD, IO>: Storage<'md, DT, MD, IO>
+pub trait LinkedStorage<DT, MD, IO>: Storage<DT, MD, IO>
 where
-  DT: Data<'md, MD, IO> + Linked,
-  MD: Meta<'md>,
+  DT: Data<MD, IO> + Linked,
+  MD: Meta,
   IO: io::Write + io::Read + io::Seek,
 {
-  fn create_linked(&self, link: &str, proc: fn(&mut DT) -> io::Result<()>) -> io::Result<&str>;
-  fn link(&self, name: &str, parent: &str) -> io::Result<()>;
+  fn create_linked(
+    &self,
+    link: &str,
+    meta: &MD,
+    proc: fn(&mut DT) -> io::Result<()>,
+  ) -> io::Result<&str>;
   fn linked_parent(&self, name: &str) -> io::Result<Option<String>>;
   fn linked_children(&self, name: &str) -> io::Result<Vec<String>>;
 }
