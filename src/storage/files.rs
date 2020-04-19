@@ -226,7 +226,7 @@ where
     meta: &MD,
     proc: fn(&mut File<MD>) -> io::Result<()>,
   ) -> io::Result<()> {
-    // TODO: metadata processing
+    // TODO: metadata  processing
     let mut data = File::create(name, &self.expand_path(name)?, meta)?;
     proc(&mut data)?;
     data.close();
@@ -234,7 +234,7 @@ where
   }
 
   fn read(&self, name: &str, proc: fn(&mut File<MD>) -> io::Result<()>) -> io::Result<()> {
-    // TODO: metadata processing
+    // TODO: metadata  processing
     let mut data = File::open_for_read(name, &self.expand_path(name)?, &MD::default())?;
     proc(&mut data)?;
     data.close();
@@ -247,7 +247,7 @@ where
     meta: &MD,
     proc: fn(&mut File<MD>) -> io::Result<()>,
   ) -> io::Result<()> {
-    // TODO: metadata processing
+    // TODO: metadata and links processing
     let mut data = File::open_for_write(name, &self.expand_path(name)?, meta)?;
     proc(&mut data)?;
     data.close();
