@@ -1,5 +1,4 @@
 use chrono::{DateTime, Utc};
-use serde;
 use std::hash;
 use std::io;
 use std::ops;
@@ -60,7 +59,7 @@ where
     link: &str,
     meta: &MD,
     proc: fn(&mut DT) -> io::Result<()>,
-  ) -> io::Result<&str>;
+  ) -> io::Result<String>;
   fn linked_parent(&self, name: &str) -> io::Result<Option<String>>;
   fn linked_children(&self, name: &str) -> io::Result<Vec<String>>;
 }

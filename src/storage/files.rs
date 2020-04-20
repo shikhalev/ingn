@@ -1,6 +1,9 @@
 use super::*;
+use crate::utils::defhash::DefHash;
 use chrono::{DateTime, Utc};
+use std::ffi;
 use std::fs;
+use std::hash;
 use std::io;
 use std::io::Write;
 use std::ops;
@@ -27,6 +30,7 @@ impl<MD: Meta> File<MD> {
       writer: Some(fs::File::create(path)?),
       reader: None,
       extension: match path.extension() {
+        // FIXME
         Some(os) => match os.to_str() {
           Some(s) => Some(s.to_lowercase()),
           None => None,
@@ -49,6 +53,7 @@ impl<MD: Meta> File<MD> {
       writer: None,
       reader: Some(io::BufReader::new(fs::File::open(path)?)),
       extension: match path.extension() {
+        // FIXME
         Some(os) => match os.to_str() {
           Some(s) => Some(s.to_lowercase()),
           None => None,
@@ -71,6 +76,7 @@ impl<MD: Meta> File<MD> {
       writer: Some(fs::File::open(path)?),
       reader: None,
       extension: match path.extension() {
+        // FIXME
         Some(os) => match os.to_str() {
           Some(s) => Some(s.to_lowercase()),
           None => None,
@@ -200,19 +206,53 @@ impl<MD: Meta> Linked for File<MD> {
 }
 
 pub struct Files {
-  root: String,
+  root: path::PathBuf,
 }
 
 impl Files {
-  pub fn new(root: &str) -> Self {
+  pub fn new(root: &path::Path) -> Self {
     Self {
-      root: root.to_owned(),
+      root: fs::canonicalize(root).unwrap(), // FIXME: unwrap
     }
   }
 
+  pub fn root(&self) -> &path::Path {
+    self.root.as_ref()
+  }
+
   #[inline]
+  #[deprecated]
   fn expand_path(&self, path: &str) -> io::Result<path::PathBuf> {
-    fs::canonicalize(format!("{}/{}", self.root, path))
+    fs::canonicalize(format!("{}/{}", self.root.to_str().unwrap(), path)) // FIXME: unwrap
+  }
+
+  fn mk_path<N, M>(&self, name: N, meta: Option<M>) -> io::Result<path::PathBuf>
+  where
+    N: AsRef<ffi::OsStr> + hash::Hash,
+    M: hash::Hash,
+  {
+    let ext = path::Path::new(name.as_ref())
+      .extension()
+      .unwrap()
+      .to_str()
+      .unwrap(); // FIXME: unwrap
+    let base = name.default_hash();
+    match meta {
+      Some(m) => Ok(self.root.join(base).join(m.default_hash() + ext).canonicalize()?),
+      None => Ok(self.root.join(base + ext).canonicalize()?),
+    }
+  }
+
+  #[cfg(unix)]
+  fn symlink(&self, name: &str, src: &str) -> io::Result<()> {
+    use std::os::unix::fs as ufs;
+    ufs::symlink(self.expand_path(src)?, self.expand_path(name)?)
+  }
+
+  #[cfg(windows)]
+  fn symlink(&self, name: &str, src: &str) -> io::Result<()> {
+    use std::os::windows::fs as wfs;
+    wfs::symlink_file(self.expand_path(src)?, self.expand_path(name)?)
   }
 }
 
@@ -227,7 +267,7 @@ where
     proc: fn(&mut File<MD>) -> io::Result<()>,
   ) -> io::Result<()> {
     // TODO: metadata  processing
-    let mut data = File::create(name, &self.expand_path(name)?, meta)?;
+    let mut data = File::create(name, &self.mk_path::<&str, MD>(name, None)?, meta)?;
     proc(&mut data)?;
     data.close();
     Ok(())
@@ -235,7 +275,11 @@ where
 
   fn read(&self, name: &str, proc: fn(&mut File<MD>) -> io::Result<()>) -> io::Result<()> {
     // TODO: metadata  processing
-    let mut data = File::open_for_read(name, &self.expand_path(name)?, &MD::default())?;
+    let mut data = File::open_for_read(
+      name,
+      &self.mk_path::<&str, MD>(name, None)?,
+      &MD::default(),
+    )?;
     proc(&mut data)?;
     data.close();
     Ok(())
@@ -248,17 +292,21 @@ where
     proc: fn(&mut File<MD>) -> io::Result<()>,
   ) -> io::Result<()> {
     // TODO: metadata and links processing
-    let mut data = File::open_for_write(name, &self.expand_path(name)?, meta)?;
+    let mut data =
+      File::open_for_write(name, &self.mk_path::<&str, MD>(name, None)?, meta)?;
     proc(&mut data)?;
     data.close();
     Ok(())
   }
 
   fn delete(&self, name: &str) -> io::Result<()> {
-    unimplemented!()
+    // TODO: metadata and links processing
+    fs::remove_file(&self.mk_path::<&str, MD>(name, None)?)
   }
+
   fn alias(&self, name: &str, src: &str) -> io::Result<()> {
-    unimplemented!()
+    // TODO: metadata and links processing
+    self.symlink(name, src)
   }
 }
 
@@ -271,12 +319,18 @@ where
     link: &str,
     meta: &MD,
     proc: fn(&mut File<MD>) -> io::Result<()>,
-  ) -> io::Result<&str> {
-    unimplemented!()
+  ) -> io::Result<String> {
+    let path = &self.mk_path::<&str, MD>(link, None)?;
+    let mut data = File::create(link, path, meta)?; // FIXME: name as link -> name from link and meta
+    proc(&mut data)?;
+    data.close();
+    Ok(link.to_owned()) // FIXME: name as link -> name from link and meta
   }
+
   fn linked_parent(&self, name: &str) -> io::Result<Option<String>> {
     unimplemented!()
   }
+
   fn linked_children(&self, name: &str) -> io::Result<Vec<String>> {
     unimplemented!()
   }
