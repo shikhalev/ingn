@@ -1,7 +1,8 @@
 use actix_web::{web, Result};
 use actix_web::{App, HttpServer};
-use ingn::img;
 use serde_derive::{Deserialize, Serialize};
+use std::collections::HashMap;
+
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ImagePath {
@@ -10,8 +11,8 @@ pub struct ImagePath {
 
 pub async fn img_get(
   _path: web::Path<ImagePath>,
-  query: web::Query<img::Query>,
-) -> Result<web::Json<img::Query>> {
+  query: web::Query<HashMap<String,String>>,
+) -> Result<web::Json<HashMap<String,String>>> {
   let qq = query.clone();
   // qq.filters = crate::names![Alpha,Beta,Gamma];
   Ok(web::Json(qq))
