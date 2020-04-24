@@ -16,6 +16,8 @@ actix-rt = "*"
 actix-service = "*"
 image = "*"
 chrono = { version="*", features = ["serde"] }
+futures = "*"
+bytes = "*"
 
 [dev-dependencies]
 more-asserts = "*"
