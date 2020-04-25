@@ -21,6 +21,15 @@ impl From<Option<usize>> for Dim {
   }
 }
 
+impl From<Option<Dim>> for Dim {
+  fn from(value: Option<Dim>) -> Self {
+    match value {
+      Some(v) => v,
+      None => Dim::Auto,
+    }
+  }
+}
+
 impl From<usize> for Dim {
   fn from(value: usize) -> Self {
     Dim::Value(value)
@@ -32,4 +41,3 @@ pub struct Size {
   width: Dim,
   height: Dim,
 }
-
