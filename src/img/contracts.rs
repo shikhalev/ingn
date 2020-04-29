@@ -5,7 +5,7 @@ use futures::stream::Stream;
 use std::io;
 
 pub trait Getter {
-  fn get(&self, filename: &str, query: &Query) -> io::Result<Box<dyn Stream<Item = Bytes>>>;
+  fn get(&self, filename: &str, query: &Specs) -> io::Result<Box<dyn Stream<Item = Bytes>>>;
 }
 
 #[derive(Copy, Clone)]

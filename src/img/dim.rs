@@ -1,6 +1,6 @@
 use serde_derive::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize, PartialEq)]
 pub enum Dim {
   Value(usize),
   Auto,
@@ -38,6 +38,6 @@ impl From<usize> for Dim {
 
 #[derive(Default, Copy, Clone, Serialize, Deserialize)]
 pub struct Size {
-  width: Dim,
-  height: Dim,
+  pub width: Dim,
+  pub height: Dim,
 }
