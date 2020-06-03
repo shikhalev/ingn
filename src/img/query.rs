@@ -118,7 +118,7 @@ pub struct Specs {
 }
 
 impl Specs {
-  pub fn new(query: &Query, info: &Info) -> Self {
+  pub fn new(_: &Query, _: &Info) -> Self {
     // let mut w = query.width.or(query.size.width).or(query.large);
     // let mut h = query.height.or(query.size.height).or(query.large);
     Self::default()

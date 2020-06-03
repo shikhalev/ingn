@@ -17,7 +17,9 @@ actix-service = "*"
 image = "*"
 chrono = { version="*", features = ["serde"] }
 futures = "*"
+futures-util = "*"
 bytes = "*"
+async-trait = "*"
 
 [dev-dependencies]
 more-asserts = "*"
